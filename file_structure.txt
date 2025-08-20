@@ -1,0 +1,29 @@
+signature_app/
+│── app.py                        # Streamlit main app
+│── requirements.txt              # dependencies
+│
+├── models/                       # Pretrained weights
+│   ├── best.pt                   # YOLO model (signature detection)
+│   └── vgg_finetuned.h5          # Optional finetuned VGG model
+│
+├── uploads/                      # Temporary uploaded docs
+├── crops/                        # YOLO cropped signatures
+├── SOURCE/
+│   ├── __init__.py
+│   │
+│   ├── yolo_files/               # YOLO signature detection
+│   │   ├── __init__.py
+│   │   └── detect.py             # wrapper for YOLO detect
+│   │
+│   ├── vgg_model/                # Feature extraction + verification
+│   │   ├── __init__.py
+│   │   └── vgg_verify.py         # VGG embedding & similarity
+│   │
+│   ├── utils/                    # Helper utilities
+│   │   ├── __init__.py
+│   │   ├── file_utils.py         # upload/save/cleanup/pdf2image
+│   │   └── image_utils.py        # OpenCV preprocessing
+│   │
+│   └── gan_files/ (optional)     # Signature cleaning GAN
+│       ├── __init__.py
+│       └── clean.py
