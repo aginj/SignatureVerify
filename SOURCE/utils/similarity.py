@@ -3,28 +3,28 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def calculate_multiple_similarities(features1, features2, weights=None):
     """
-    Calculate cosine, Euclidean, Manhattan similarities and distances.
-    Also compute a weighted similarity score if weights provided.
+    Calculate multiple similarity/distance metrics between two embeddings.
+    Assumes embeddings are already L2-normalized.
     """
     try:
         # Ensure numpy arrays
         f1 = np.array(features1).reshape(1, -1)
         f2 = np.array(features2).reshape(1, -1)
 
-        # Cosine similarity
+        # Cosine similarity (best for normalized embeddings)
         cosine_sim = float(cosine_similarity(f1, f2)[0][0])
 
-        # Euclidean
+        # Euclidean distance (0 = identical, 2 = opposite for unit vectors)
         euclidean_dist = float(np.linalg.norm(f1 - f2))
         euclidean_sim = 1 / (1 + euclidean_dist)
 
-        # Manhattan
+        # Manhattan distance
         manhattan_dist = float(np.sum(np.abs(f1 - f2)))
         manhattan_sim = 1 / (1 + manhattan_dist)
 
-        # Weighted similarity (default: equal weights)
+        # Weighted similarity (default weights: cosine strongest)
         if weights is None:
-            weights = {"cosine": 0.4, "euclidean": 0.3, "manhattan": 0.3}
+            weights = {"cosine": 0.6, "euclidean": 0.25, "manhattan": 0.15}
 
         weighted_score = (
             cosine_sim * weights["cosine"] +
@@ -42,5 +42,5 @@ def calculate_multiple_similarities(features1, features2, weights=None):
         }
 
     except Exception as e:
-        print(f"[Similarity Error] {e}")  # for debugging in terminal
+        print(f"[Similarity Error] {e}")
         return None

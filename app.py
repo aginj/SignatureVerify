@@ -13,7 +13,7 @@ st.set_page_config(page_title="Signature Verification", page_icon="✍️", layo
 
 
 def process_document(uploaded_file):
-    """Save uploaded file, convert PDF → image (first page), run YOLO, return first signature crop (RGB)."""
+    """Save uploaded file, convert PDF → image (first page), run YOLO, return first signature embedding."""
     file_path = save_uploaded_file(uploaded_file)
 
     if file_path.lower().endswith(".pdf"):
@@ -79,12 +79,11 @@ def main():
                 })
                 st.dataframe(table_df, use_container_width=True)
 
-                # Weighted score & classification
+                # Weighted score & classification (aligned with second app)
                 st.subheader("✅ Classification Results")
                 st.metric("Weighted Similarity Score", f"{sims['weighted_similarity']:.4f}")
 
-                # Verdict using weighted score threshold
-                threshold = 0.6
+                threshold = 0.80  # 🔑 same as second app
                 verdict = "🔒 Likely MATCH" if sims["weighted_similarity"] >= threshold else "❌ Likely DIFFERENT"
                 st.success(f"Verdict (weighted ≥ {threshold}): {verdict}")
 
