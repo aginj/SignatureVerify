@@ -1,30 +1,41 @@
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+def l2_normalize(vec):
+    """Ensure vector is L2-normalized."""
+    norm = np.linalg.norm(vec)
+    if norm == 0:
+        return vec
+    return vec / norm
+
 def calculate_multiple_similarities(features1, features2, weights=None):
     """
-    Calculate multiple similarity/distance metrics between two embeddings.
-    Assumes embeddings are already L2-normalized.
+    Calculate cosine, Euclidean, Manhattan similarities and distances.
+    Also compute a weighted similarity score if weights provided.
     """
     try:
         # Ensure numpy arrays
-        f1 = np.array(features1).reshape(1, -1)
-        f2 = np.array(features2).reshape(1, -1)
+        f1 = np.array(features1).flatten()
+        f2 = np.array(features2).flatten()
 
-        # Cosine similarity (best for normalized embeddings)
+        # 🔑 Safeguard normalization
+        f1 = l2_normalize(f1).reshape(1, -1)
+        f2 = l2_normalize(f2).reshape(1, -1)
+
+        # Cosine similarity
         cosine_sim = float(cosine_similarity(f1, f2)[0][0])
 
-        # Euclidean distance (0 = identical, 2 = opposite for unit vectors)
+        # Euclidean
         euclidean_dist = float(np.linalg.norm(f1 - f2))
-        euclidean_sim = 1 / (1 + euclidean_dist)
+        euclidean_sim = 1 - (euclidean_dist / 2)   # better scaling for [0,1]
 
-        # Manhattan distance
+        # Manhattan
         manhattan_dist = float(np.sum(np.abs(f1 - f2)))
-        manhattan_sim = 1 / (1 + manhattan_dist)
+        manhattan_sim = 1 / (1 + manhattan_dist)   # keep compressed into (0,1]
 
-        # Weighted similarity (default weights: cosine strongest)
+        # Weighted similarity (default: cosine-heavy)
         if weights is None:
-            weights = {"cosine": 0.6, "euclidean": 0.25, "manhattan": 0.15}
+            weights = {"cosine": 0.8, "euclidean": 0.15, "manhattan": 0.05}
 
         weighted_score = (
             cosine_sim * weights["cosine"] +
@@ -42,5 +53,6 @@ def calculate_multiple_similarities(features1, features2, weights=None):
         }
 
     except Exception as e:
-        print(f"[Similarity Error] {e}")
+        print(f"[Similarity Error] {e}")  # for debugging in terminal
         return None
+
